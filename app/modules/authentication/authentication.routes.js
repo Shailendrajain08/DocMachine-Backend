@@ -15,6 +15,7 @@ const sgMail = require('@sendgrid/mail');
 const EmailFormat = require('../mails/mailhelper/email-store/email-formats');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 require('dotenv').config({ path: '.env' });
+const nodemailer = require('nodemailer');
 
 let config = {
     localConfig: {
@@ -367,22 +368,29 @@ router.put("/updateemail", function(req, res) {
                             appConfig = config.localConfig
                     }
                     const html = EmailFormat.generalFormat({ html: `User Logged in with ${req.body.emailId} to DocMachine please check `, heading: "New User Registered", host: appConfig.frontend.url });
+                    
+                    let transporter = nodemailer.createTransport({
+                        service: 'gmail', // Use your email service
+                        auth: {
+                            user: process.env.EMAIL_USER, // Your email
+                            pass: process.env.EMAIL_PASSWORD // Your email password
+                        }
+                    });
+
+                    
                     const msg = {
-                        to: ['docmachinetec@gmail.com', 'tramsdocmachine@gmail.com', 'fintech.innovations2021@gmail.com'], // Change to your recipient
-                        from: "admin@docmachine.in", // Change to your verified sender
+                        to: ['shailendra.jain0894@gmail.com'], // Change to your recipient
+                        from: "shailendrajain.javaventures@gmail.com", // Change to your verified sender
                         subject: "New User Registered",
                         text: "New User Registered",
                         html: html
                     };
 
-                    sgMail
-                        .send(msg)
-                        .then(() => {
-                            res.status(200)
-                                .json({
-                                    message: "Verified Successfully",
-                                    data: user
-                                })
+                    let info = transporter.sendMail(msg);
+                    res.status(200)
+                        .json({
+                            message: "Verified Successfully",
+                            data: user
                         })
                         .catch((error) => {
                             console.error(JSON.stringify(error));

@@ -5,6 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const EmailFormat = require("../../mails/mailhelper/email-store/email-formats");
 require('dotenv').config({ path: '.env' });
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 let config = {
     localConfig: {
@@ -173,27 +174,45 @@ const sendVerifyEmail = (dataObj, next) => {
                 let content = `<p>Hello!</p><br/>`;
                 content = content + `<p>Welcome to Docmachine Click <a href= '` + forgotemailLink + `'>to verify your account.</a></p><br/>`;
                 const html = EmailFormat.generalFormat({ html: content, heading: "Account Verification", host: appConfig.frontend.url });
+                
+                let transporter = nodemailer.createTransport({
+                    service: 'gmail', // Use your email service
+                    auth: {
+                        user: process.env.EMAIL_USER, // Your email
+                        pass: process.env.EMAIL_PASSWORD // Your email password
+                    }
+                });
+                
                 const msg = {
                     to: dataObj.emailId, // Change to your recipient
                     // bcc: ['docmachinetec@gmail.com', 'tramsdocmachine@gmail.com', 'fintech.innovations2021@gmail.com'],
-                    from: "admin@docmachine.in", // Change to your verified sender
+                    from: "shailendra.jain@gmail.com", // Change to your verified sender
                     subject: "Verify Your email",
                     text: "Welcome to docMachine",
                     html: html
                 };
 
-                sgMail
-                    .send(msg)
-                    .then(() => {
-                        console.log("Message Sent");
-                        next(null, { success: true });
+                // sgMail
+                //     .send(msg)
+                //     .then(() => {
+                //         console.log("Message Sent");
+                //         next(null, { success: true });
 
-                    }).catch((error) => {
-                        console.log(error);
-                        console.error(JSON.stringify(error));
-                        next(error, null);
+                //     }).catch((error) => {
+                //         console.log(error);
+                //         console.error(JSON.stringify(error));
+                //         next(error, null);
 
-                    })
+                //     })
+
+                let info = transporter.sendMail(msg);
+                next(null, { success: true });
+                // res.send(200)
+                //     .json({
+                //         message: "Verified Successfully",
+                //         data: user
+                //     })
+
                     // MailHelper.sendMandrillMail(mailData, (err, data) => {
                     //     if (err) {
                     //         console.dir("err");
