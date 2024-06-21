@@ -6,6 +6,7 @@ const ProfileDetailsModel = require('../projects/models/ProfileDetails').Profile
 const sgMail = require("@sendgrid/mail");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const EmailTemplate = require("../projects/model_helpers/email_template");
+import jwt_decode from 'jwt-decode';
 
 const addUser = (user, callback) => {
     console.log("ADD USER MODEL ");
